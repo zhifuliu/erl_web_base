@@ -1,4 +1,4 @@
-{application, mark,
+{application, erl_web_base,
  [
   {description, ""},
   {vsn, "1"},
@@ -7,6 +7,6 @@
                   kernel,
                   stdlib
                  ]},
-  {mod, { mark_app, []}},
+  {mod, { erl_web_base_app, []}},
   {env, []}
  ]}.

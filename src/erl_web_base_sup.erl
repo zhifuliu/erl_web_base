@@ -1,4 +1,4 @@
--module(mark_sup).
+-module(erl_web_base_sup).
 
 -behaviour(supervisor).
 
