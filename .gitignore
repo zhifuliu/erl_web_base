@@ -1,0 +1,6 @@
+*.beam
+.DS_Store
+3rd/
+ebin/
+**/*.dump
+logs/
