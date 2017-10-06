@@ -11,8 +11,8 @@ exec erl \
     -pa ebin \
     -pa 3rd/*/ebin \
     -boot start_sasl \
-    -sname erl_web_base \
-    -s erl_web_base \
+    -sname myappnode \
+    -s myapp \
     -s reloader \
     # -detached
 

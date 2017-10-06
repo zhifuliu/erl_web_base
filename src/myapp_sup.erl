@@ -1,4 +1,4 @@
--module(erl_web_base_sup).
+-module(myapp_sup).
 
 -behaviour(supervisor).
 

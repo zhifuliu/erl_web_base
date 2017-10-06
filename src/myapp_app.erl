@@ -1,4 +1,4 @@
--module(erl_web_base_app).
+-module(myapp_app).
 
 -behaviour(application).
 
@@ -10,7 +10,7 @@
 %% ===================================================================
 
 start(_StartType, _StartArgs) ->
-    erl_web_base_sup:start_link().
+    myapp_sup:start_link().
 
 stop(_State) ->
     ok.

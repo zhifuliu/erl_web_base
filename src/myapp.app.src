@@ -1,4 +1,4 @@
-{application, erl_web_base,
+{application, myapp,
  [
   {description, ""},
   {vsn, "1"},
@@ -7,6 +7,6 @@
                   kernel,
                   stdlib
                  ]},
-  {mod, { erl_web_base_app, []}},
+  {mod, { myapp_app, []}},
   {env, []}
  ]}.
