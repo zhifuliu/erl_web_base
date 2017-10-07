@@ -9,48 +9,48 @@ start(Port) ->
     spawn(
         fun() ->
             case gen_tcp:listen(Port, [{active, false}, {reuseaddr, true}]) of
-                {ok, Sock} ->
+                {ok, ListenSocket} ->
                     % 监听成功后，交由 loop 函数来执行监听
                     ?LOG_INFO("start myapp_web success", []),
-                    loop(Sock);
+                    loop(ListenSocket);
                 {error, Reason} ->
                     ?LOG_INFO("start myapp_web fail, reason:~p", [Reason])
             end
         end
     ).
 
-loop(Sock) ->
+loop(ListenSocket) ->
     % 监听客户端的请求，每来一个请求，改变本次请求的控制进程（新开的线程），交由 handle 来处理
-    case gen_tcp:accept(Sock) of
-        {ok, Conn} ->
+    case gen_tcp:accept(ListenSocket) of
+        {ok, Socket} ->
             % ?LOG_INFO("get request", []),
-            ?LOG_INFO("~p", [Sock]),
+            ?LOG_INFO("~p", [Socket]),
             Handler = spawn(
                 fun() ->
-                    handle(Conn)
+                    handle(Socket)
                 end
             ),
             % 改变套接字控制进程，将本次套接字交由 Handler 处理，Handler 新开了一个线程，所以，可以立马接收下一个请求
-            gen_tcp:controlling_process(Conn, Handler);
+            gen_tcp:controlling_process(Socket, Handler);
         {error, Reason} ->
             ?LOG_INFO("gen_tcp accept error, reason:~p", [Reason])
     end,
-    loop(Sock).
+    loop(ListenSocket).
 
-handle(Conn) ->
+handle(Socket) ->
     % 每一个请求都会转到本函数来处理
 
     % gen_server 实验，这个地方调用 visitors_dict gen_server 中的添加一次访问
     GenResult = gen_server:call(visitors_dict, {add}),
     % ?LOG_INFO("~p", [GenResult]),
 
-    case gen_tcp:send(Conn, response(integer_to_list(GenResult))) of
+    case gen_tcp:send(Socket, response(integer_to_list(GenResult))) of
         ok ->
             ?LOG_INFO("reponse success", []);
         {error, Reason} ->
             ?LOG_INFO("reponse fail, reason:~p", [Reason])
     end,
-    gen_tcp:close(Conn).
+    gen_tcp:close(Socket).
 
 response(Str) ->
     B = iolist_to_binary(Str),
