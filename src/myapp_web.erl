@@ -4,53 +4,53 @@
 -include("settings.hrl").
 
 start(Port) ->
-    ?LOG_INFO("~p", ["start myapp_web"]),
+    ?LOG_INFO("start myapp_web", []),
     % 开启一个新线程来监听指定端口
-    spawn(
-        fun() ->
-            case gen_tcp:listen(Port, [{active, false}, {reuseaddr, true}]) of
-                {ok, ListenSocket} ->
-                    % 监听成功后，交由 loop 函数来执行监听
-                    ?LOG_INFO("start myapp_web success", []),
-                    loop(ListenSocket);
-                {error, Reason} ->
-                    ?LOG_INFO("start myapp_web fail, reason:~p", [Reason])
-            end
-        end
-    ).
+    case gen_tcp:listen(Port, [binary, {packet, 4}, {reuseaddr, true}, {active, once}]) of
+        {ok, Listen} ->
+            spawn(fun() -> accept(Listen) end);
+            % accept(Listen);
+        {error, Reason} ->
+            ?LOG_INFO("~p", [Reason]),
+            Reason
+    end.
+    % {ok, Listen} = gen_tcp:listen(Port, [binary, {reuseaddr, true}, {active, true}]),
+    % {ok, Socket} = gen_tcp:accept(Listen),
+    % loop(Socket).
 
-loop(ListenSocket) ->
-    % 监听客户端的请求，每来一个请求，改变本次请求的控制进程（新开的线程），交由 handle 来处理
-    case gen_tcp:accept(ListenSocket) of
+accept(Listen) ->
+    ?LOG_INFO("accept", []),
+    case gen_tcp:accept(Listen) of
         {ok, Socket} ->
-            % ?LOG_INFO("get request", []),
-            ?LOG_INFO("~p", [Socket]),
-            Handler = spawn(
-                fun() ->
-                    handle(Socket)
-                end
-            ),
-            % 改变套接字控制进程，将本次套接字交由 Handler 处理，Handler 新开了一个线程，所以，可以立马接收下一个请求
+            Handler = spawn(fun() -> loop(Socket) end),
             gen_tcp:controlling_process(Socket, Handler);
         {error, Reason} ->
-            ?LOG_INFO("gen_tcp accept error, reason:~p", [Reason])
+            ?LOG_INFO("~p", [Reason]),
+            Reason
     end,
-    loop(ListenSocket).
+    accept(Listen).
 
-handle(Socket) ->
-    % 每一个请求都会转到本函数来处理
-
-    % gen_server 实验，这个地方调用 visitors_dict gen_server 中的添加一次访问
-    GenResult = gen_server:call(visitors_dict, {add}),
-    % ?LOG_INFO("~p", [GenResult]),
-
-    case gen_tcp:send(Socket, response(integer_to_list(GenResult))) of
-        ok ->
-            ?LOG_INFO("reponse success", []);
-        {error, Reason} ->
-            ?LOG_INFO("reponse fail, reason:~p", [Reason])
-    end,
-    gen_tcp:close(Socket).
+loop(Socket) ->
+    receive
+        {tcp, Socket, Data} ->
+            ?LOG_INFO("received: ~p", [Data]),
+            GenResult = gen_server:call(visitors_dict, {add}),
+            ?LOG_INFO("GenResult: ~p", [GenResult]),
+            gen_tcp:send(Socket, response(integer_to_list(GenResult))),
+            loop(Socket);
+        {tcp_closed, Socket} ->
+            ?LOG_INFO("[~p] tcp_closed", [Socket]),
+            gen_tcp:close(Socket);
+        {tcp_error, Socket, Reason} ->
+            ?LOG_INFO("[~p] tcp_error: ~p", [Socket, Reason]),
+            gen_tcp:close(Socket);
+        _Other ->
+            ?LOG_INFO("other", []),
+            gen_tcp:close(Socket)
+    after 10000 ->
+        ?LOG_INFO("timeout", []),
+        gen_tcp:close(Socket)
+    end.
 
 response(Str) ->
     B = iolist_to_binary(Str),
