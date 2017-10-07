@@ -1,11 +1,11 @@
 odds                        | completed time
 --------------------------- | --------------
-rebar 初始化工程                 |
-使用 shell 脚本启动工程             |
-log4erl                     |
-gen_server                  |
+rebar 初始化工程                 | 20171006
+使用 shell 脚本启动工程             | 20171007
+log4erl                     | 20171007
+gen_server                  | 20171007
 cts                         |
-python sql 工具               |
+python sql 工具               | 20171007
 emysql                      |
 tcp 请求解析                    |
 请求过滤器                       |
