@@ -23,6 +23,8 @@ gen_server的停止规则：
 
 ---------- 分割线 ----------
 
+参考：<http://diaocow.iteye.com/blog/1756615>
+
 编写一个 gen_server 的 callback 模块步骤：
 
 1. 给 calback Module 命名
@@ -53,3 +55,37 @@ result                           | 解释
 {noreply,NewState,hibernate}     | 无返回
 {stop,Reason,Reply,NewState}     | 有返回
 {stop,Reason,NewState}           | 有返回
+
+---------- 分割线 ----------
+
+参考：<http://blog.csdn.net/lqg1122/article/details/7484413>
+
+gen_server 提供了 C/S 架构中的服务端的实现，即定义了自己一套规范的服务器框架。
+
+gen_server 实现流程：
+
+1. 先定义模块的行为模式为 gen_server：-behaviour(gen_server)
+2. 实现 gen_server 的回调方法，并 export 出来
+3. export 模块的对外调用函数
+4. 实现2和3 export 出来的函数
+5. 调用 gen_server:start 或者 gen_server:start_link 启动 server
+6. 在注册名字成功后，新的 gen_server 进程会调用回调函数 Module:init([Args])，init 返回 {ok, State}，其中 State 是 gen_server 的内部状态
+
+对于 start_link，调用形式：gen_server:start_link(ServerName, Module, Args, Options)，参数的具体意义如下。这里要注意：
+
+1. gen_server:start_link 是同步的。只有等到 gen_server 被完全初始化并准备接受请求之后才返回
+2. 如果 gen_server 是某棵监督树的一部分，即 gen_server 是由一个督程启动的，那么必须使用 gen_server:start_link。还有另外一个函数 gen_server:start 用于启动一个独立的 gen_server。
+
+3. ServerName: server 的名字，别的进程可以通过这个名字调用该 server 暴露的接口
+
+4. Module: 回调模块的名字，也就是回调函数放在哪个模块里面。一般来说，将代表同一个进程的代码和同一个模块放在一起
+
+5. Args: 将原封不动传递给回调函数 init
+
+6. Options: 参数列表
+
+---------- 分割线 ----------
+
+## 总结
+
+流程如上面这个一样，将在 myapp_sup.erl 中注册 gen_server
