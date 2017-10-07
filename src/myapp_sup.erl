@@ -18,7 +18,8 @@
 %% ===================================================================
 
 start_link() ->
-    ?LOG_INFO("~p", [?MODULE]),
+    % 启动 gen_server
+    visitors_dict:start(),
     supervisor:start_link({local, ?MODULE}, ?MODULE, []).
 
 %% ===================================================================

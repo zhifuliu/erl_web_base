@@ -38,7 +38,11 @@ loop(Sock) ->
 
 handle(Conn) ->
     % 每一个请求都会转到本函数来处理
-    case gen_tcp:send(Conn, response("zhifu")) of
+
+    % gen_server 实验，这个地方调用 visitors_dict gen_server 中的添加一次访问
+    GenResult = gen_server:call(visitors_dict, {add}),
+    ?LOG_INFO("~p", [GenResult]),
+    case gen_tcp:send(Conn, response(integer_to_list(GenResult))) of
         ok ->
             ?LOG_INFO("reponse success", []);
         {error, Reason} ->
