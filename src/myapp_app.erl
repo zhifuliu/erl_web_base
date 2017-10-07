@@ -16,7 +16,7 @@ start() ->
 
 start(_StartType, _StartArgs) ->
     log4erl:conf("priv/log4erl.conf"),
-    myapp_web:start(8080, "../src/test"),
+    myapp_web:start(8080),
     myapp_sup:start_link().
 
 stop(_State) ->
