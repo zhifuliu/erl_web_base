@@ -15,10 +15,8 @@ start() ->
     start(type, args).
 
 start(_StartType, _StartArgs) ->
-    % myapp_sup:start_link(),
-    % og4erl:conf("priv/log4erl.conf"),
+    log4erl:conf("priv/log4erl.conf"),
     myapp_web:start(8080, "../src/test"),
-    ?LOG("~p", ["myapp_app start"]),
     myapp_sup:start_link().
 
 stop(_State) ->

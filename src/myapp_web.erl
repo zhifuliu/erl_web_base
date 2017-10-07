@@ -4,7 +4,7 @@
 -include("settings.hrl").
 
 start(Port, Doc) ->
-    ?LOG("~p", ["start myapp_web"]),
+    ?LOG_INFO("~p", ["start myapp_web"]),
     spawn(
         fun() ->
             {ok, Sock} = gen_tcp:listen(Port, [{active, false}]),
@@ -13,7 +13,7 @@ start(Port, Doc) ->
     ).
 
 loop(Sock, Doc) ->
-    ?LOG("~p", ["get request"]),
+    ?LOG_INFO("~p", ["get request"]),
     {ok, Conn} = gen_tcp:accept(Sock),
     Handler = spawn(
         fun() ->
@@ -24,7 +24,7 @@ loop(Sock, Doc) ->
     loop(Sock, Doc).
 
 handle(Conn, Doc) ->
-    ?LOG("~p", [Doc]),
+    ?LOG_INFO("~p", [Doc]),
     % {ok, Data} = file:read_file(Doc),
     % Data = zhifu,
     % gen_tcp:send(Conn, response(binary_to_list(Data))),
