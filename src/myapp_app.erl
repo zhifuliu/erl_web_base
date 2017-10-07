@@ -5,11 +5,14 @@
 -include("settings.hrl").
 
 %% Application callbacks
--export([start/2, stop/1]).
+-export([start/0, start/2, stop/1]).
 
 %% ===================================================================
 %% Application callbacks
 %% ===================================================================
+
+start() ->
+    start(type, args).
 
 start(_StartType, _StartArgs) ->
     % myapp_sup:start_link(),

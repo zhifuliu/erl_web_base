@@ -25,9 +25,10 @@ loop(Sock, Doc) ->
 
 handle(Conn, Doc) ->
     ?LOG("~p", [Doc]),
-    {ok, Data} = file:read_file(Doc),
-    % Data = "zhifu",
-    gen_tcp:send(Conn, response(binary_to_list(Data))),
+    % {ok, Data} = file:read_file(Doc),
+    % Data = zhifu,
+    % gen_tcp:send(Conn, response(binary_to_list(Data))),
+    gen_tcp:send(Conn, response("zhifu")),
     gen_tcp:close(Conn).
 
 response(Str) ->

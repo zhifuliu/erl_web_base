@@ -9,11 +9,11 @@ fi
 
 exec erl \
     -pa ebin \
-    # -pa 3rd/*/ebin \
-    # -boot start_sasl \
-    # -sname myapp_dev \
-    -s myapp \
-    # -s reloader \
+    -pa 3rd/*/ebin \
+    -boot start_sasl \
+    -sname myapp_dev \
+    -s myapp_app \
+    -s reloader \
     # -detached
 
     # -pa 将目录加到搜索路径的开头，-pz 则将目录加到搜索路径的末尾。用于加载 code，指定 code 目录
