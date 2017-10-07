@@ -26,7 +26,7 @@ init([]) ->
 handle_call({add, Key, Value}, _From, Dict) ->
     Reply = dict:store(Key, Value, Dict),
     {reply, ok, Reply};
-handle_call({find, Keu}, _From, Dict) ->
+handle_call({find, Key}, _From, Dict) ->
     Reply = dict:find(Key, Dict),
     {reply, Reply, Dict}.
 
