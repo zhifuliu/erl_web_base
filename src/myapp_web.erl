@@ -8,7 +8,7 @@ start(Port) ->
     % 开启一个新线程来监听指定端口
     spawn(
         fun() ->
-            case gen_tcp:listen(Port, [{active, false}]) of
+            case gen_tcp:listen(Port, [{active, false}, {reuseaddr, true}]) of
                 {ok, Sock} ->
                     % 监听成功后，交由 loop 函数来执行监听
                     ?LOG_INFO("start myapp_web success", []),
@@ -23,7 +23,7 @@ loop(Sock) ->
     % 监听客户端的请求，每来一个请求，改变本次请求的控制进程（新开的线程），交由 handle 来处理
     case gen_tcp:accept(Sock) of
         {ok, Conn} ->
-            ?LOG_INFO("get request", []),
+            % ?LOG_INFO("get request", []),
             Handler = spawn(
                 fun() ->
                     handle(Conn)
@@ -41,7 +41,8 @@ handle(Conn) ->
 
     % gen_server 实验，这个地方调用 visitors_dict gen_server 中的添加一次访问
     GenResult = gen_server:call(visitors_dict, {add}),
-    ?LOG_INFO("~p", [GenResult]),
+    % ?LOG_INFO("~p", [GenResult]),
+
     case gen_tcp:send(Conn, response(integer_to_list(GenResult))) of
         ok ->
             ?LOG_INFO("reponse success", []);

@@ -16,7 +16,7 @@
 -define(VISITORS_LAST_TIME, "visitor_last_time").
 
 start() ->
-    ?LOG_INFO("~p starting", [?SERVER]),
+    % ?LOG_INFO("~p starting", [?SERVER]),
     gen_server:start_link({local, ?SERVER}, ?MODULE, [], []).
 
 stop() ->
@@ -29,10 +29,10 @@ init([]) ->
 get(Key, Dict) ->
     case dict:find(Key, Dict) of
         {ok, Count} ->
-            ?LOG_INFO("~p : ~p", [Key, Count]),
+            % ?LOG_INFO("~p : ~p", [Key, Count]),
             Count;
         error ->
-            ?LOG_INFO("get ~p error", [Key]),
+            % ?LOG_INFO("get ~p error", [Key]),
             error
     end.
 
