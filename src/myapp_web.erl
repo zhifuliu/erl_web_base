@@ -24,6 +24,7 @@ loop(Sock) ->
     case gen_tcp:accept(Sock) of
         {ok, Conn} ->
             % ?LOG_INFO("get request", []),
+            ?LOG_INFO("~p", [Sock]),
             Handler = spawn(
                 fun() ->
                     handle(Conn)
