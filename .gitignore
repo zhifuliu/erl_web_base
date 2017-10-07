@@ -5,3 +5,4 @@ ebin/
 .rebar/
 **/*.dump
 logs/
+*.pyc
