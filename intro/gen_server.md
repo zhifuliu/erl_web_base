@@ -88,4 +88,5 @@ gen_server 实现流程：
 
 ## 总结
 
-流程如上面这个一样，将在 myapp_sup.erl 中注册 gen_server
+1. 流程如上面这个一样，将在 myapp_sup.erl 中注册 gen_server
+2. 关于状态更新：init 函数返回了 {ok, State}，State 就是初始化的状态，在执行完哥哥回调后，查看上面关于 result 的片段，不同的回调会在不同的参数位置表示返回和更新状态变量
