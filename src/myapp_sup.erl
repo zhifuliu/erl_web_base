@@ -2,6 +2,8 @@
 
 -behaviour(supervisor).
 
+-include("settings.hrl").
+
 %% API
 -export([start_link/0]).
 
@@ -16,6 +18,7 @@
 %% ===================================================================
 
 start_link() ->
+    ?LOG("~p", [?MODULE]),
     supervisor:start_link({local, ?MODULE}, ?MODULE, []).
 
 %% ===================================================================
@@ -24,4 +27,3 @@ start_link() ->
 
 init([]) ->
     {ok, { {one_for_one, 5, 10}, []} }.
-

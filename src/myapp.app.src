@@ -1,8 +1,10 @@
+%% -*- erlang -*-
 {application, myapp,
-    [{description, ""},
-    {vsn, "1"},
+    [{description, "myapp"},
+    {vsn, "1.0"},
+    {modules, []},
     {registered, []},
-    {applications, [kernel, stdlib]},
-    {mod, {"myapp_app", []}},
-    {env, []}
+    {mod, {myapp_app, []}},
+    {env, []},
+    {applications, [kernel, stdlib]}
  ]}.
