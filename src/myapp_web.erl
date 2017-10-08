@@ -37,49 +37,13 @@ loop(ListenSocket) ->
 
 handle(Socket) ->
     % 每一个请求都会转到本函数来处理
-    Request = do_recv(Socket),
-    ?LOG_INFO("Request Data:~p", [Request]),
+    Request = http_utils:doRecv(Socket),
+    Request,
+    % ?LOG_INFO("Request Data:~p", [Request]),
 
     % gen_server 实验，这个地方调用 visitors_dict gen_server 中的添加一次访问
     GenResult = gen_server:call(visitors_dict, {add}),
     % ?LOG_INFO("~p", [GenResult]),
 
-    do_send(Socket, response(integer_to_list(GenResult))),
+    http_utils:doSend(Socket, http_utils:response(integer_to_list(GenResult))),
     gen_tcp:close(Socket).
-
-response(Str) ->
-    B = iolist_to_binary(Str),
-    iolist_to_binary(
-        io_lib:fwrite(
-            "HTTP/1.0 200 Ok\nConnect-Type: text/html\nContent-length: ~p\n\n~s", [size(B), B]
-        )
-    ).
-
-do_send(Socket, Msg) ->
-    case gen_tcp:send(Socket, Msg) of
-        ok ->
-            ?LOG_INFO("reponse success", []),
-            ok;
-        {error, Reason} ->
-            ?LOG_INFO("reponse fail, reason:~p", [Reason]),
-            exit(Reason)
-    end.
-
-do_recv(Socket) ->
-    case gen_tcp:recv(Socket, 0) of
-        {ok, Data} ->
-            % binary_to_list(Data);
-            re:split(Data, "[\r\n]");
-            % {ok,[Cmd|[Name|[Vers|_]]]} = split(Req,"[ \r\n]"),
-            % Data;
-        {error, closed} ->
-            exit(closed);
-        {error, Reason} ->
-            exit(Reason)
-    end.
-
-% construct HTML for failure message
-error_response(LogReq, Reason) ->
-    "<html><head><title>Request Failed</title></head><body>\n" ++
-    "<h1>Request Failed</h1>\n" ++ "Your request to " ++ LogReq ++
-    " failed due to: " ++ Reason ++ "\n</body></html>\n".
