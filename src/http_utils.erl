@@ -9,8 +9,20 @@
 % 用途：解析请求；返回数据
 % 解析请求：传入请求数据，解析成一个 tuple，如果有错误，返回 {error, Reasong}, 否则返回 {ok, Method, Request} Request 是一个 tuple
 
+% handleRecv(Header, Other, ResultTuple) ->
+%     ?LOG_INFO("Header:~p~n", [Header]),
+%     handleRecv()
+
 getRequest(Socket) ->
     Data = http_utils:doRecv(Socket),
+    SplitData = re:split(Data, "\r\n"),
+    % lists:foreach(
+    %     fun(Item) ->
+    %         Item1 = binary_to_list(Item),
+    %         ?LOG_INFO("type: ~p item: ~p", [tools:getVariableType(Item1), Item1])
+    %     end, SplitData
+    % ),
+    ?LOG_INFO("split Data:~p~n", [SplitData]),
     Data,
     {error, "analysis Request"}.
 
@@ -36,11 +48,11 @@ doRecv(Socket) ->
     case gen_tcp:recv(Socket, 0) of
         {ok, Data} ->
             % ?LOG_INFO("Request Data type:~p~n", [tools:getVariableType(Data)]),
-            ?LOG_INFO("Request Data:~p~n", [Data]),
+            % ?LOG_INFO("Request Data:~p~n", [Data]),
 
-            SplitData = re:split(Data, "\r\n"),
+            % SplitData = re:split(Data, "\r\n"),
             % ?LOG_INFO("split Data type:~p~n", [tools:getVariableType(SplitData)]),
-            ?LOG_INFO("split Data:~p~n", [SplitData]),
+            % ?LOG_INFO("split Data:~p~n", [SplitData]),
             % {ok,[Cmd|[Name|[Vers|_]]]} = split(Req,"[ \r\n]"),
             % SplitData;
             Data;
