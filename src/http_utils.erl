@@ -36,11 +36,11 @@ doRecv(Socket) ->
     case gen_tcp:recv(Socket, 0) of
         {ok, Data} ->
             % ?LOG_INFO("Request Data type:~p~n", [tools:getVariableType(Data)]),
-            % ?LOG_INFO("Request Data:~p~n", [Data]),
+            ?LOG_INFO("Request Data:~p~n", [Data]),
 
-            % SplitData = re:split(Data, "\r\n"),
+            SplitData = re:split(Data, "\r\n"),
             % ?LOG_INFO("split Data type:~p~n", [tools:getVariableType(SplitData)]),
-            % ?LOG_INFO("split Data:~p~n", [SplitData]),
+            ?LOG_INFO("split Data:~p~n", [SplitData]),
             % {ok,[Cmd|[Name|[Vers|_]]]} = split(Req,"[ \r\n]"),
             % SplitData;
             Data;
