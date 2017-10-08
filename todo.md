@@ -12,3 +12,4 @@ tcp 请求解析                    | 20171008
 简单的注册登录接口                   |
 db server(使用 gen_server 实现) |
 接口文档()使用 swagger ui 来实现)    | 20171008
+erlang 基本语法                 |
