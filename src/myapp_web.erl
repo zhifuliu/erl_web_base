@@ -44,12 +44,7 @@ handle(Socket) ->
     GenResult = gen_server:call(visitors_dict, {add}),
     % ?LOG_INFO("~p", [GenResult]),
 
-    case gen_tcp:send(Socket, response(integer_to_list(GenResult))) of
-        ok ->
-            ?LOG_INFO("reponse success", []);
-        {error, Reason} ->
-            ?LOG_INFO("reponse fail, reason:~p", [Reason])
-    end,
+    do_send(Socket, response(integer_to_list(GenResult))),
     gen_tcp:close(Socket).
 
 response(Str) ->
@@ -63,18 +58,28 @@ response(Str) ->
 do_send(Socket, Msg) ->
     case gen_tcp:send(Socket, Msg) of
         ok ->
+            ?LOG_INFO("reponse success", []),
             ok;
         {error, Reason} ->
+            ?LOG_INFO("reponse fail, reason:~p", [Reason]),
             exit(Reason)
     end.
 
 do_recv(Socket) ->
     case gen_tcp:recv(Socket, 0) of
         {ok, Data} ->
-            % binary_to_list(Data
+            % binary_to_list(Data);
+            % regexp:split(Data, "[ \r\n]");
+            % {ok,[Cmd|[Name|[Vers|_]]]} = split(Req,"[ \r\n]"),
             Data;
         {error, closed} ->
             exit(closed);
         {error, Reason} ->
             exit(Reason)
     end.
+
+% construct HTML for failure message
+error_response(LogReq, Reason) ->
+    "<html><head><title>Request Failed</title></head><body>\n" ++
+    "<h1>Request Failed</h1>\n" ++ "Your request to " ++ LogReq ++
+    " failed due to: " ++ Reason ++ "\n</body></html>\n".
