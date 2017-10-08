@@ -37,9 +37,14 @@ loop(ListenSocket) ->
 
 handle(Socket) ->
     % 每一个请求都会转到本函数来处理
-    Request = http_utils:doRecv(Socket),
-    Request,
-    % ?LOG_INFO("Request Data:~p", [Request]),
+    case http_utils:getRequest(Socket) of
+        {ok, Method, Request} ->
+            Method,
+            Request,
+            ok;
+        {error, Reason} ->
+            ?LOG_INFO("~p", [Reason])
+    end,
 
     % gen_server 实验，这个地方调用 visitors_dict gen_server 中的添加一次访问
     GenResult = gen_server:call(visitors_dict, {add}),

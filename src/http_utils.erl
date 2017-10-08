@@ -9,9 +9,10 @@
 % 用途：解析请求；返回数据
 % 解析请求：传入请求数据，解析成一个 tuple，如果有错误，返回 {error, Reasong}, 否则返回 {ok, Method, Request} Request 是一个 tuple
 
-getRequest(Data) ->
+getRequest(Socket) ->
+    Data = http_utils:doRecv(Socket),
     Data,
-    {error, "解析"}.
+    {error, "analysis Request"}.
 
 response(Str) ->
     B = iolist_to_binary(Str),
@@ -34,8 +35,8 @@ doSend(Socket, Msg) ->
 doRecv(Socket) ->
     case gen_tcp:recv(Socket, 0) of
         {ok, Data} ->
-            ?LOG_INFO("Request Data type:~p~n", [tools:getVariableType(Data)]),
-            ?LOG_INFO("Request Data:~p~n", [Data]),
+            % ?LOG_INFO("Request Data type:~p~n", [tools:getVariableType(Data)]),
+            % ?LOG_INFO("Request Data:~p~n", [Data]),
 
             SplitData = re:split(Data, "\r\n"),
             ?LOG_INFO("split Data type:~p~n", [tools:getVariableType(SplitData)]),
