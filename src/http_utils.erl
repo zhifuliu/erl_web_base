@@ -38,11 +38,12 @@ doRecv(Socket) ->
             % ?LOG_INFO("Request Data type:~p~n", [tools:getVariableType(Data)]),
             % ?LOG_INFO("Request Data:~p~n", [Data]),
 
-            SplitData = re:split(Data, "\r\n"),
-            ?LOG_INFO("split Data type:~p~n", [tools:getVariableType(SplitData)]),
-            ?LOG_INFO("split Data:~p~n", [SplitData]),
+            % SplitData = re:split(Data, "\r\n"),
+            % ?LOG_INFO("split Data type:~p~n", [tools:getVariableType(SplitData)]),
+            % ?LOG_INFO("split Data:~p~n", [SplitData]),
             % {ok,[Cmd|[Name|[Vers|_]]]} = split(Req,"[ \r\n]"),
-            SplitData;
+            % SplitData;
+            Data;
         {error, closed} ->
             exit(closed);
         {error, Reason} ->
