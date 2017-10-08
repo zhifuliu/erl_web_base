@@ -8,22 +8,42 @@
 
 % 用途：解析请求；返回数据
 % 解析请求：传入请求数据，解析成一个 tuple，如果有错误，返回 {error, Reasong}, 否则返回 {ok, Method, Request} Request 是一个 tuple
+% 只处理 post 和 get 请求，其他的返回错误；数据也只处理 json 数据
 
-% handleRecv(Header, Other, ResultTuple) ->
-%     ?LOG_INFO("Header:~p~n", [Header]),
-%     handleRecv()
+% 解析请求行
+getRequestLine(HeaderLine) ->
+    ItemList = re:split(HeaderLine, " "),
+    [Method | _] = lists:sublist(ItemList, 1, 1),
+    [Url | _] = lists:sublist(ItemList, 2, 1),
+    [Version | _] = lists:sublist(ItemList, 3, 1),
+    {binary_to_list(Method), binary_to_list(Url), binary_to_list(Version)}.
+
+% 解析请求头
+getHeaderData(HeaderData) ->
+    ok,
 
 getRequest(Socket) ->
     Data = http_utils:doRecv(Socket),
-    SplitData = re:split(Data, "\r\n"),
-    lists:foreach(
-        fun(Item) ->
-            Item1 = binary_to_list(Item),
-            ?LOG_INFO("type: ~p item: ~p", [tools:getVariableType(Item1), Item1])
-        end, SplitData
-    ),
+    % 分别获取 http 请求中的请求行、请求头、请求数据
+    [Header | BodyData] = re:split(Data, "\r\n\r\n"),
+    [RequestLine | HeaderData] = re:split(Header, "\r\n"),
+    % ?LOG_INFO("request line. type: ~p ; data: ~p", [tools:getVariableType(RequestLine), RequestLine]),
+    % ?LOG_INFO("header. type: ~p ; data: ~p", [tools:getVariableType(HeaderData), HeaderData]),
+    % ?LOG_INFO("body. type: ~p ; data: ~p", [tools:getVariableType(BodyData), BodyData]),
+
+    % 解析请求行
+    {Method, RequestUrl, HttpVersion} = getRequestLine(RequestLine),
+
+    % 解析请求头数据
+    getHeaderData(HeaderData),
+
+    % lists:foreach(
+    %     fun(Item) ->
+    %         Item1 = binary_to_list(Item),
+    %         ?LOG_INFO("type: ~p item: ~p", [tools:getVariableType(Item1), Item1])
+    %     end, SplitData
+    % ),
     % ?LOG_INFO("split Data:~p~n", [SplitData]),
-    Data,
     {error, "analysis Request"}.
 
 response(Str) ->
