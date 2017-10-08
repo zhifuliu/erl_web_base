@@ -130,13 +130,13 @@
                 "description": "发送一个带参数的 post 请求，比如：注册",
                 "parameters": [{
                         "name": "account",
-                        "in": "query",
+                        "in": "formData",
                         "type": "string",
                         "description": "账号"
                     },
                     {
                         "name": "password",
-                        "in": "query",
+                        "in": "formData",
                         "type": "string",
                         "description": "密码"
                     }
@@ -164,13 +164,13 @@
                 "description": "发送一个带参数的 post 请求，比如：登录",
                 "parameters": [{
                         "name": "account",
-                        "in": "query",
+                        "in": "formData",
                         "type": "string",
                         "description": "账号"
                     },
                     {
                         "name": "password",
-                        "in": "query",
+                        "in": "formData",
                         "type": "string",
                         "description": "密码"
                     }
