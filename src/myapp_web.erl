@@ -69,9 +69,9 @@ do_recv(Socket) ->
     case gen_tcp:recv(Socket, 0) of
         {ok, Data} ->
             % binary_to_list(Data);
-            % regexp:split(Data, "[ \r\n]");
+            re:split(Data, "[\r\n]");
             % {ok,[Cmd|[Name|[Vers|_]]]} = split(Req,"[ \r\n]"),
-            Data;
+            % Data;
         {error, closed} ->
             exit(closed);
         {error, Reason} ->
