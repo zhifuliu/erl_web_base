@@ -23,8 +23,6 @@ loop(ListenSocket) ->
     % 监听客户端的请求，每来一个请求，改变本次请求的控制进程（新开的线程），交由 handle 来处理
     case gen_tcp:accept(ListenSocket) of
         {ok, Socket} ->
-            % ?LOG_INFO("get request", []),
-            ?LOG_INFO("~p", [Socket]),
             Handler = spawn(
                 fun() ->
                     handle(Socket)
@@ -39,6 +37,8 @@ loop(ListenSocket) ->
 
 handle(Socket) ->
     % 每一个请求都会转到本函数来处理
+    Request = do_recv(Socket),
+    ?LOG_INFO("Request Data:~p", [Request]),
 
     % gen_server 实验，这个地方调用 visitors_dict gen_server 中的添加一次访问
     GenResult = gen_server:call(visitors_dict, {add}),
@@ -59,3 +59,22 @@ response(Str) ->
             "HTTP/1.0 200 Ok\nConnect-Type: text/html\nContent-length: ~p\n\n~s", [size(B), B]
         )
     ).
+
+do_send(Socket, Msg) ->
+    case gen_tcp:send(Socket, Msg) of
+        ok ->
+            ok;
+        {error, Reason} ->
+            exit(Reason)
+    end.
+
+do_recv(Socket) ->
+    case gen_tcp:recv(Socket, 0) of
+        {ok, Data} ->
+            % binary_to_list(Data
+            Data;
+        {error, closed} ->
+            exit(closed);
+        {error, Reason} ->
+            exit(Reason)
+    end.
