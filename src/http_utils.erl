@@ -16,13 +16,13 @@
 getRequest(Socket) ->
     Data = http_utils:doRecv(Socket),
     SplitData = re:split(Data, "\r\n"),
-    % lists:foreach(
-    %     fun(Item) ->
-    %         Item1 = binary_to_list(Item),
-    %         ?LOG_INFO("type: ~p item: ~p", [tools:getVariableType(Item1), Item1])
-    %     end, SplitData
-    % ),
-    ?LOG_INFO("split Data:~p~n", [SplitData]),
+    lists:foreach(
+        fun(Item) ->
+            Item1 = binary_to_list(Item),
+            ?LOG_INFO("type: ~p item: ~p", [tools:getVariableType(Item1), Item1])
+        end, SplitData
+    ),
+    % ?LOG_INFO("split Data:~p~n", [SplitData]),
     Data,
     {error, "analysis Request"}.
 
