@@ -69,6 +69,40 @@
                 }
             }
         },
+        "/login_get": {
+            "get": {
+                "summary": "登录",
+                "description": "发送一个带参数的 get 请求，比如：登录",
+                "parameters": [{
+                        "name": "account",
+                        "in": "query",
+                        "type": "string",
+                        "description": "账号"
+                    },
+                    {
+                        "name": "password",
+                        "in": "query",
+                        "type": "string",
+                        "description": "密码"
+                    }
+                ],
+                "tags": ["GET_request"],
+                "responses": {
+                    "200": {
+                        "description": "用户信息",
+                        "schema": {
+                            "$ref": "#/definitions/User"
+                        }
+                    },
+                    "default": {
+                        "description": "返回结果",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        },
         "/userInfo_post": {
             "post": {
                 "summary": "没有参数的 post 请求",
@@ -94,6 +128,40 @@
             "post": {
                 "summary": "注册",
                 "description": "发送一个带参数的 post 请求，比如：注册",
+                "parameters": [{
+                        "name": "account",
+                        "in": "query",
+                        "type": "string",
+                        "description": "账号"
+                    },
+                    {
+                        "name": "password",
+                        "in": "query",
+                        "type": "string",
+                        "description": "密码"
+                    }
+                ],
+                "tags": ["POST_request"],
+                "responses": {
+                    "200": {
+                        "description": "用户信息",
+                        "schema": {
+                            "$ref": "#/definitions/User"
+                        }
+                    },
+                    "default": {
+                        "description": "返回结果",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/login_post": {
+            "post": {
+                "summary": "登录",
+                "description": "发送一个带参数的 post 请求，比如：登录",
                 "parameters": [{
                         "name": "account",
                         "in": "query",
