@@ -12,39 +12,65 @@
 
 % 解析请求行
 getRequestLine(HeaderLine) ->
-    ItemList = re:split(HeaderLine, " "),
-    [Method | _] = lists:sublist(ItemList, 1, 1),
-    [Url | _] = lists:sublist(ItemList, 2, 1),
-    [Version | _] = lists:sublist(ItemList, 3, 1),
-    {binary_to_list(Method), binary_to_list(Url), binary_to_list(Version)}.
+    SplitHeaderData = re:split(HeaderLine, " "),
+    % ?LOG_INFO("~p", [erlang:length(SplitHeaderData)]),
+    case erlang:length(SplitHeaderData) of
+        3 ->
+            [Method, Url, Version | _] = SplitHeaderData,
+            {string:to_lower(binary_to_list(Method)), binary_to_list(Url), binary_to_list(Version)};
+        _ ->
+            {error, "请求行解析错误，不是三个数据"}
+    end.
 
-% 解析请求头
-getHeaderData(HeaderData) ->
-    ok,
+% 解析请求头，解析成映射组
+getHeaderData(HeaderData, OldMap) when erlang:length(HeaderData) > 0 ->
+    [Current | Other] = HeaderData,
+    [Key, Value | _] = re:split(Current, ": "),
+    getHeaderData(Other, OldMap#{string:to_lower(binary_to_list(Key)) => binary_to_list(Value)});
+getHeaderData([], Map) ->
+    Map.
+
+% 通过请求字符串得到请求参数 map
+getParamsMap(List, OldMap) when erlang:length(List) > 0 ->
+    [Current | Other] = List,
+    [Key, Value | _] = re:split(Current, "="),
+    getParamsMap(Other, OldMap#{binary_to_list(Key) => binary_to_list(Value)});
+getParamsMap([], Map) ->
+    Map.
+
+% 解携请求参数，解析成映射组
+getRequestParams(Method, RequestUrl, BodyData) ->
+    case Method of
+        "get" ->
+            [Method1, ParamsUrl | _] = re:split(RequestUrl, "\\?"),
+            {binary_to_list(Method1), getParamsMap(re:split(ParamsUrl, "&"), #{})};
+        "post" ->
+            [ParamsUrl | _] = BodyData,
+            {Method, getParamsMap(re:split(ParamsUrl, "&"), #{})}
+    end.
+
 
 getRequest(Socket) ->
     Data = http_utils:doRecv(Socket),
     % 分别获取 http 请求中的请求行、请求头、请求数据
     [Header | BodyData] = re:split(Data, "\r\n\r\n"),
     [RequestLine | HeaderData] = re:split(Header, "\r\n"),
-    % ?LOG_INFO("request line. type: ~p ; data: ~p", [tools:getVariableType(RequestLine), RequestLine]),
-    % ?LOG_INFO("header. type: ~p ; data: ~p", [tools:getVariableType(HeaderData), HeaderData]),
-    % ?LOG_INFO("body. type: ~p ; data: ~p", [tools:getVariableType(BodyData), BodyData]),
 
     % 解析请求行
-    {Method, RequestUrl, HttpVersion} = getRequestLine(RequestLine),
+    case getRequestLine(RequestLine) of
+        {Method, RequestUrl, HttpVersion} ->
+            % 解析请求头数据：解析成映射诅
+            HeaderMap = getHeaderData(HeaderData, #{}),
 
-    % 解析请求头数据
-    getHeaderData(HeaderData),
+            % 获取请求参数，区分 GET 和 POST 请求的参数位置
+            {RequestUrl1, ParamsMap} = getRequestParams(Method, RequestUrl, BodyData),
+            % ?LOG_INFO("~p", [ParamsMap]),
+            {ok, Method, #{url => RequestUrl1, httpVersion => HttpVersion, headerParams => HeaderMap, requestParams => ParamsMap}};
+        {error, Reason} ->
+            % 解析请求行错误
+            exit(Reason)
+    end.
 
-    % lists:foreach(
-    %     fun(Item) ->
-    %         Item1 = binary_to_list(Item),
-    %         ?LOG_INFO("type: ~p item: ~p", [tools:getVariableType(Item1), Item1])
-    %     end, SplitData
-    % ),
-    % ?LOG_INFO("split Data:~p~n", [SplitData]),
-    {error, "analysis Request"}.
 
 response(Str) ->
     B = iolist_to_binary(Str),
@@ -67,14 +93,6 @@ doSend(Socket, Msg) ->
 doRecv(Socket) ->
     case gen_tcp:recv(Socket, 0) of
         {ok, Data} ->
-            % ?LOG_INFO("Request Data type:~p~n", [tools:getVariableType(Data)]),
-            % ?LOG_INFO("Request Data:~p~n", [Data]),
-
-            % SplitData = re:split(Data, "\r\n"),
-            % ?LOG_INFO("split Data type:~p~n", [tools:getVariableType(SplitData)]),
-            % ?LOG_INFO("split Data:~p~n", [SplitData]),
-            % {ok,[Cmd|[Name|[Vers|_]]]} = split(Req,"[ \r\n]"),
-            % SplitData;
             Data;
         {error, closed} ->
             exit(closed);

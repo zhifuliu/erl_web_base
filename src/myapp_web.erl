@@ -39,8 +39,7 @@ handle(Socket) ->
     % 每一个请求都会转到本函数来处理
     case http_utils:getRequest(Socket) of
         {ok, Method, Request} ->
-            Method,
-            Request,
+            ?LOG_INFO("~nmethod:~p ~n httpObject:~p~n", [Method, Request]),
             ok;
         {error, Reason} ->
             ?LOG_INFO("~p", [Reason])
