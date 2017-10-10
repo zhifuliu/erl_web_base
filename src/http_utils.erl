@@ -46,10 +46,10 @@ getRequestParams(Method, RequestUrl, BodyData) ->
             {binary_to_list(Method1), getParamsMap(re:split(ParamsUrl, "&"), #{})};
         "post" ->
             [ParamsUrl | _] = BodyData,
-            {Method, getParamsMap(re:split(ParamsUrl, "&"), #{})}
+            {RequestUrl, getParamsMap(re:split(ParamsUrl, "&"), #{})}
     end.
 
-
+% 将 tcp 获取到的 http 请求解析成一个 erlang 数据结构
 getRequest(Socket) ->
     Data = http_utils:doRecv(Socket),
     % 分别获取 http 请求中的请求行、请求头、请求数据
