@@ -47,15 +47,21 @@ handle(Socket) ->
                 {ok, HandleModule, HandleFunc} ->
                     erlang:apply(HandleModule, HandleFunc, [Request#request.headerParams, Request#request.requestParams]);
                 {error, ErrorCode, Reason} ->
+                    Reponse = request_utils:generateReponse(ErrorCode, "error", Request#request.httpVersion, Request#request.headerParams, "11111111"),
+                    % ?LOG_INFO("~p", [Reponse]),
+                    http_utils:doSend(Socket, http_utils:response(Reponse)),
                     ?LOG_INFO("errorCode:~p ; ~p", [ErrorCode, Reason])
             end;
         {error, ErrorCode, Reason} ->
-            ?LOG_INFO("errorCodeL:~p ; ~p", [ErrorCode, Reason])
+            Reponse = request_utils:generateReponse(ErrorCode, "error", "http/1.1", [], ""),
+            % ?LOG_INFO("~p", [Reponse]),
+            http_utils:doSend(Socket, http_utils:response(Reponse)),
+            ?LOG_INFO("errorCode:~p ; ~p", [ErrorCode, Reason])
     end,
 
     % gen_server 实验，这个地方调用 visitors_dict gen_server 中的添加一次访问
     GenResult = gen_server:call(visitors_dict, {add}),
     % ?LOG_INFO("~p", [GenResult]),
 
-    http_utils:doSend(Socket, http_utils:response(integer_to_list(GenResult))),
+    % http_utils:doSend(Socket, http_utils:response(integer_to_list(GenResult))),
     gen_tcp:close(Socket).

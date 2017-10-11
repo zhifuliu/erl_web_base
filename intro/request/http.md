@@ -80,3 +80,32 @@ HTTP 请求/响应的步骤：
 5. 客户端浏览器解析 html 内容并运行
 
 ## GET 和 POST 请求的区别
+
+## 应答头信息
+
+参考：<http://www.cnblogs.com/mumue/archive/2012/04/23/2467072.html>
+
+key           | remark
+------------- | -------------------------------
+Cache-Control | 指定请求和响应遵循的缓存机制
+Date          | 消息发送时间
+Pragma        | 用来包含特定的指令，最常用的是 Parama:no-cache
+
+## 典型的响应消息：
+
+```
+HTTP/1.0200OK
+Date:Mon,31Dec200104:25:57GMT
+Server:Apache/1.3.14(Unix)
+Content-type:text/html
+Last-modified:Tue,17Apr200106:46:28GMT
+Etag:"a030f020ac7c01:1e9f"
+Content-length:39725426
+Content-range:bytes554554-40279979/40279980
+```
+
+分别表示：<br>
+
+```
+1
+```

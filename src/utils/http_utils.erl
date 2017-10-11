@@ -4,7 +4,7 @@
 
 -export([analysisRequest/1]).
 
--export([response/1, doRecv/1, doSend/2, errorResponse/2]).
+-export([response/1, doRecv/1, doSend/2]).
 
 % 用途：解析请求；返回数据
 % 解析请求：传入请求数据，解析成一个 tuple，如果有错误，返回 {error, Reasong}, 否则返回 {ok, Method, Request} Request 是一个 tuple
@@ -97,11 +97,25 @@ analysisRequest(Socket) ->
     end.
 
 
-response(Str) ->
-    B = iolist_to_binary(Str),
+response(Reponse) ->
+    % B = iolist_to_binary(Str),
+    % iolist_to_binary(
+    %     io_lib:fwrite(
+    %         "HTTP/1.0 200 Ok\nConnect-Type: text/html\nContent-length: ~p\n\n~s", [size(B), B]
+    %     )
+    % ).
+    B = iolist_to_binary(Reponse#reponse.reponseData),
+    % ?LOG_INFO("~p", [io_lib:fwrite("~p\n~p\n\n~s", [Reponse#reponse.reponseLine, string:join(Reponse#reponse.reponseHeader, "\n"), B])]),
+    % Result = string:join(Reponse#reponse.reponseHeader, "\n"),
+    Header = string:join(Reponse#reponse.reponseHeader, "\n"),
+    ?LOG_INFO("~w", [Header]),
+    ?LOG_INFO("~w", [Reponse#reponse.reponseLine]),
+    ?LOG_INFO("~w", [io_lib:fwrite("~p\n~p\n\n~s", [Reponse#reponse.reponseLine, Header, B])]),
+    % Result1 = string:join([Reponse#reponse.reponseLine, Result, "\n", B], "\n"),
+    % ?LOG_INFO("~p", [Result1]),
     iolist_to_binary(
         io_lib:fwrite(
-            "HTTP/1.0 200 Ok\nConnect-Type: text/html\nContent-length: ~p\n\n~s", [size(B), B]
+            "~p\n~p\n\n~s", [Reponse#reponse.reponseLine, Header, B]
         )
     ).
 
@@ -122,9 +136,3 @@ doRecv(Socket) ->
         {error, Reason} ->
             {error, ?TCP_ERROR, Reason}
     end.
-
-% construct HTML for failure message
-errorResponse(LogReq, Reason) ->
-    "<html><head><title>Request Failed</title></head><body>\n" ++
-    "<h1>Request Failed</h1>\n" ++ "Your request to " ++ LogReq ++
-    " failed due to: " ++ Reason ++ "\n</body></html>\n".

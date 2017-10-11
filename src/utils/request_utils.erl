@@ -2,7 +2,7 @@
 
 -include("../settings.hrl").
 
--export([apiFilter/2, listAllInMap/3]).
+-export([apiFilter/2, listAllInMap/3, generateReponse/5]).
 
 % 本模块用来处理请求，比如：接口过滤器
 
@@ -51,3 +51,14 @@ apiFilter(Req, LogindIn) ->
         error ->
             {error, ?NOT_FOUND, "api not exist"}
     end.
+
+% 通过给定数据，构造一个 reponse 结构。只有简单的信息：Content-type、Content-length
+generateReponse(StatusCode, Msg, HttpVersion, HeaderParams, ReponseData) ->
+    B = iolist_to_binary(ReponseData),
+    ReponseLine = string:join([HttpVersion, StatusCode, Msg], " "),
+    ReponseHeader = [
+        "Content-type:application/json",
+        string:join(["Content-length", erlang:size(B)], ":")
+    ],
+    HeaderParams,
+    #reponse{reponseLine=ReponseLine, reponseHeader=ReponseHeader, reponseData=ReponseData}.
