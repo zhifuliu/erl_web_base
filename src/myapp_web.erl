@@ -45,11 +45,11 @@ handle(Socket) ->
             case request_utils:apiFilter(Request, LogindIn) of
                 ok ->
                     ok;
-                {error, Reason} ->
-                    ?LOG_INFO("~p", [Reason])
+                {error, ErrorCode, Reason} ->
+                    ?LOG_INFO("errorCode:~p ; ~p", [ErrorCode, Reason])
             end;
-        {error, Reason} ->
-            ?LOG_INFO("~p", [Reason])
+        {error, ErrorCode, Reason} ->
+            ?LOG_INFO("errorCodeL:~p ; ~p", [ErrorCode, Reason])
     end,
 
     % gen_server 实验，这个地方调用 visitors_dict gen_server 中的添加一次访问

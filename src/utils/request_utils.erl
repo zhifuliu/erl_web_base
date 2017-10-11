@@ -26,15 +26,15 @@ apiFilter(Req, LogindIn) ->
     Url = maps:get("url", Req),
     Params = maps:get("requestParams", Req),
     % ?LOG_INFO("~p", [?ApiList]),
-    ?LOG_INFO("~p ; ~p", [Url, Params]),
+    % ?LOG_INFO("~p ; ~p", [Url, Params]),
     case maps:find(Url, ?ApiList) of
         {ok, Value} ->
             {{requireLogin, RequireLogin}, {params, RequireParams}} = Value,
-            ?LOG_INFO("~p ; ~p ; ~p", [Url, RequireLogin, RequireParams]),
+            % ?LOG_INFO("~p ; ~p ; ~p", [Url, RequireLogin, RequireParams]),
             case (RequireLogin =:= true) and (LogindIn =:= false) of
                 true ->
                     % 要登录却没有登录
-                    {error, string:join(["api:", Url, " require login"], "")};
+                    {error, ?NOT_LOGIN, string:join(["api:", Url, " require login"], "")};
                 false ->
                     % 不需要登录或者已经登录，那么检查参数
                     case listAllInMap(true, RequireParams, Params) of
@@ -43,9 +43,9 @@ apiFilter(Req, LogindIn) ->
                             ok;
                         false ->
                             % 参数不完整
-                            {error, string:join(["api:", Url, " param lost. required parmas:", RequireParams], "")}
+                            {error, ?PARAMS_ERROR, string:join(["api:", Url, " param lost. required parmas:", RequireParams], "")}
                     end
             end;
         error ->
-            {error, "api not exist"}
+            {error, ?NOT_FOUND, "api not exist"}
     end.

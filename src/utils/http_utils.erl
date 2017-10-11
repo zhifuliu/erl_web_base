@@ -17,9 +17,9 @@ getRequestLine(RequestLine) ->
         3 ->
             [Method, Url, Version | _] = SplitRequestLine,
             [_, Url1 | _] = re:split(Url, "/"),
-            {string:to_lower(binary_to_list(Method)), binary_to_list(Url1), binary_to_list(Version)};
+            {ok, string:to_lower(binary_to_list(Method)), binary_to_list(Url1), binary_to_list(Version)};
         _ ->
-            {error, "请求行解析错误，不是三个数据"}
+            {error, ?HTTP_ERROR, "请求行解析错误，不是三个数据"}
     end.
 
 % 解析请求头，解析成映射组
@@ -60,7 +60,7 @@ getRequestParams(Method, RequestUrl, RequestBody) ->
             end;
         _ ->
             % ?LOG_INFO("method not support", []),
-            {error, "method not support"}
+            {error, ?HTTP_ERROR, "method not support"}
     end.
 
 % 将 tcp 获取到的 http 请求解析成一个 erlang 数据结构
@@ -73,7 +73,7 @@ analysisRequest(Socket) ->
 
             % 解析请求行
             case getRequestLine(RequestLine) of
-                {Method, RequestUrl, HttpVersion} ->
+                {ok, Method, RequestUrl, HttpVersion} ->
                     % 解析请求头数据：解析成映射诅
                     HeaderMap = getHeaderData(HeaderLines, #{}),
 
@@ -82,17 +82,17 @@ analysisRequest(Socket) ->
                     case getRequestParams(Method, RequestUrl, RequestBody) of
                         {ok, RequestUrl1, ParamsMap} ->
                             {ok, Method, #{"method" => Method, "url" => RequestUrl1, "httpVersion" => HttpVersion, "headerParams" => HeaderMap, "requestParams" => ParamsMap}};
-                        {error, Reason} ->
+                        {error, ErrorCode, Reason} ->
                             % 当前 http 请求方法不支持
-                            {error, Reason}
+                            {error, ErrorCode, Reason}
                     end;
-                {error, Reason} ->
+                {error, ErrorCode, Reason} ->
                     % 解析请求行错误
-                    {error, Reason}
+                    {error, ErrorCode, Reason}
             end;
-        {error, Reason} ->
+        {error, ErrorCode, Reason} ->
             % 从 套接字获取请求数据失败
-            {error, Reason}
+            {error, ErrorCode, Reason}
     end.
 
 
@@ -111,7 +111,7 @@ doSend(Socket, Msg) ->
             ok;
         {error, Reason} ->
             ?LOG_INFO("reponse fail, reason:~p", [Reason]),
-            {error, Reason}
+            {error, ?TCP_ERROR, Reason}
     end.
 
 doRecv(Socket) ->
@@ -119,7 +119,7 @@ doRecv(Socket) ->
         {ok, Data} ->
             {ok, Data};
         {error, Reason} ->
-            {error, Reason}
+            {error, ?TCP_ERROR, Reason}
     end.
 
 % construct HTML for failure message

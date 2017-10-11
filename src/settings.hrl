@@ -20,3 +20,11 @@
         "login_post" => {{requireLogin, false}, {params, ["account", "password"]}}
     }
 ).
+
+% http 请求常用错误码
+-define(NOT_FOUND, 404).
+-define(NOT_LOGIN, 404).
+-define(PARAMS_ERROR, 404).
+-define(SERVER_ERROR, 500).
+-define(HTTP_ERROR, 500).
+-define(TCP_ERROR, 500).
