@@ -12,12 +12,12 @@
 % 所有 api 列表,配置信息：名字、是否需要登录、参数列表
 -define(ApiList,
     #{
-        "userInfo_get" => {{requireLogin, true}, {params, []}},
-        "register_get" => {{requireLogin, false}, {params, ["account", "password"]}},
-        "login_get" => {{requireLogin, false}, {params, ["account", "password"]}},
-        "userInfo_post" => {{requireLogin, true}, {params, []}},
-        "register_post" => {{requireLogin, false}, {params, ["account", "password"]}},
-        "login_post" => {{requireLogin, false}, {params, ["account", "password"]}}
+        "userInfo_get" => {{requireLogin, true}, {params, []}, {handler, user, getUserInfo}},
+        "register_get" => {{requireLogin, false}, {params, ["account", "password"]}, {handler, user, register}},
+        "login_get" => {{requireLogin, false}, {params, ["account", "password"]}, {handler, user, login}},
+        "userInfo_post" => {{requireLogin, true}, {params, []}, {handler, user, getUserInfo}},
+        "register_post" => {{requireLogin, false}, {params, ["account", "password"]}, {handler, user, register}},
+        "login_post" => {{requireLogin, false}, {params, ["account", "password"]}, {handler, user, login}}
     }
 ).
 

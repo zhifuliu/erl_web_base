@@ -29,7 +29,7 @@ apiFilter(Req, LogindIn) ->
     % ?LOG_INFO("~p ; ~p", [Url, Params]),
     case maps:find(Url, ?ApiList) of
         {ok, Value} ->
-            {{requireLogin, RequireLogin}, {params, RequireParams}} = Value,
+            {{requireLogin, RequireLogin}, {params, RequireParams}, {handler, Module, Func}} = Value,
             % ?LOG_INFO("~p ; ~p ; ~p", [Url, RequireLogin, RequireParams]),
             case (RequireLogin =:= true) and (LogindIn =:= false) of
                 true ->
@@ -40,7 +40,7 @@ apiFilter(Req, LogindIn) ->
                     case listAllInMap(true, RequireParams, Params) of
                         true ->
                             % 需要的参数都上传了
-                            ok;
+                            {ok, Module, Func};
                         false ->
                             % 参数不完整
                             {error, ?PARAMS_ERROR, string:join(["api:", Url, " param lost. required parmas:", RequireParams], "")}

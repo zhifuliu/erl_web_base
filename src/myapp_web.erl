@@ -43,7 +43,7 @@ handle(Socket) ->
             % ?LOG_INFO("~nmethod:~p ~n httpObject:~p~n", [Method, Request]),
             LogindIn = false,
             case request_utils:apiFilter(Request, LogindIn) of
-                ok ->
+                {ok, HandleModule, HandleFunc} ->
                     ok;
                 {error, ErrorCode, Reason} ->
                     ?LOG_INFO("errorCode:~p ; ~p", [ErrorCode, Reason])
