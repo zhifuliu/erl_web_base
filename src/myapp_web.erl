@@ -45,7 +45,7 @@ handle(Socket) ->
             % ?LOG_INFO("~p;~p", [Request, Request#request.url]);
             case request_utils:apiFilter(Request, LogindIn) of
                 {ok, HandleModule, HandleFunc} ->
-                    ok;
+                    erlang:apply(HandleModule, HandleFunc, [Request#request.headerParams, Request#request.requestParams]);
                 {error, ErrorCode, Reason} ->
                     ?LOG_INFO("errorCode:~p ; ~p", [ErrorCode, Reason])
             end;
