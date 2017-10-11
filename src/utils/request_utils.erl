@@ -23,8 +23,10 @@ listAllInMap(false, _, _) ->
 
 % 接口过滤
 apiFilter(Req, LogindIn) ->
-    Url = maps:get("url", Req),
-    Params = maps:get("requestParams", Req),
+    % Url = maps:get("url", Req),
+    % Params = maps:get("requestParams", Req),
+    Url = Req#request.url,
+    Params = Req#request.requestParams,
     % ?LOG_INFO("~p", [?ApiList]),
     % ?LOG_INFO("~p ; ~p", [Url, Params]),
     case maps:find(Url, ?ApiList) of

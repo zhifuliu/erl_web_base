@@ -81,7 +81,8 @@ analysisRequest(Socket) ->
                     % ?LOG_INFO("~n~p~n~p~n~p~n", [Method, RequestUrl, RequestBody]),
                     case getRequestParams(Method, RequestUrl, RequestBody) of
                         {ok, RequestUrl1, ParamsMap} ->
-                            {ok, Method, #{"method" => Method, "url" => RequestUrl1, "httpVersion" => HttpVersion, "headerParams" => HeaderMap, "requestParams" => ParamsMap}};
+                            % {ok, Method, #{"method" => Method, "url" => RequestUrl1, "httpVersion" => HttpVersion, "headerParams" => HeaderMap, "requestParams" => ParamsMap}};
+                            {ok, Method, #request{method = Method, url = RequestUrl1, httpVersion = HttpVersion, headerParams = HeaderMap, requestParams = ParamsMap}};
                         {error, ErrorCode, Reason} ->
                             % 当前 http 请求方法不支持
                             {error, ErrorCode, Reason}

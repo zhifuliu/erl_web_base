@@ -28,3 +28,7 @@
 -define(SERVER_ERROR, 500).
 -define(HTTP_ERROR, 500).
 -define(TCP_ERROR, 500).
+
+% 记录定义
+-record(request, {method="post", url="", httpVersion="", headerParams="", requestParams=""}).
+% -record(request, {method="post", url="", httpVersion="", headerParams="", requestParams=""}).

@@ -42,6 +42,7 @@ handle(Socket) ->
             Method,
             % ?LOG_INFO("~nmethod:~p ~n httpObject:~p~n", [Method, Request]),
             LogindIn = false,
+            % ?LOG_INFO("~p;~p", [Request, Request#request.url]);
             case request_utils:apiFilter(Request, LogindIn) of
                 {ok, HandleModule, HandleFunc} ->
                     ok;
