@@ -32,3 +32,4 @@
 % 记录定义
 -record(request, {method="post", url="", httpVersion="", headerParams="", requestParams=""}).
 -record(reponse, {reponseLine="", reponseHeader=[], reponseData=""}).
+-record(returnData, {result = true, code = 0, message = "msg", data=""}).
