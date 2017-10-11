@@ -16,7 +16,8 @@ getRequestLine(RequestLine) ->
     case erlang:length(SplitRequestLine) of
         3 ->
             [Method, Url, Version | _] = SplitRequestLine,
-            {string:to_lower(binary_to_list(Method)), binary_to_list(Url), binary_to_list(Version)};
+            [_, Url1 | _] = re:split(Url, "/"),
+            {string:to_lower(binary_to_list(Method)), binary_to_list(Url1), binary_to_list(Version)};
         _ ->
             {error, "请求行解析错误，不是三个数据"}
     end.
@@ -41,13 +42,25 @@ getParamsMap([], Map) ->
 getRequestParams(Method, RequestUrl, RequestBody) ->
     case Method of
         "get" ->
-            [Method1, ParamsUrl | _] = re:split(RequestUrl, "\\?"),
-            {ok, binary_to_list(Method1), getParamsMap(re:split(ParamsUrl, "&"), #{})};
+            case re:split(RequestUrl, "\\?") of
+                [RequestUrl1, ParamsUrl | _] ->
+                    {ok, binary_to_list(RequestUrl1), getParamsMap(re:split(ParamsUrl, "&"), #{})};
+                _ ->
+                    {ok, RequestUrl, #{}}
+            end;
         "post" ->
             [ParamsUrl | _] = RequestBody,
-            {ok, RequestUrl, getParamsMap(re:split(ParamsUrl, "&"), #{})};
+            % ?LOG_INFO("~p", [erlang:length(binary_to_list(ParamsUrl))]),
+            ParamsUrlLength = binary_to_list(ParamsUrl),
+            if
+                erlang:length(ParamsUrlLength) > 0 ->
+                    {ok, RequestUrl, getParamsMap(re:split(ParamsUrl, "&"), #{})};
+                true ->
+                    {ok, RequestUrl, #{}}
+            end;
         _ ->
-            {error, "当前请求方法不支持"}
+            % ?LOG_INFO("method not support", []),
+            {error, "method not support"}
     end.
 
 % 将 tcp 获取到的 http 请求解析成一个 erlang 数据结构
@@ -65,12 +78,13 @@ analysisRequest(Socket) ->
                     HeaderMap = getHeaderData(HeaderLines, #{}),
 
                     % 获取请求参数，区分 GET 和 POST 请求的参数位置
+                    % ?LOG_INFO("~n~p~n~p~n~p~n", [Method, RequestUrl, RequestBody]),
                     case getRequestParams(Method, RequestUrl, RequestBody) of
                         {ok, RequestUrl1, ParamsMap} ->
-                            {ok, Method, #{url => RequestUrl1, httpVersion => HttpVersion, headerParams => HeaderMap, requestParams => ParamsMap}};
+                            {ok, Method, #{"method" => Method, "url" => RequestUrl1, "httpVersion" => HttpVersion, "headerParams" => HeaderMap, "requestParams" => ParamsMap}};
                         {error, Reason} ->
                             % 当前 http 请求方法不支持
-                            exit(Reason)
+                            {error, Reason}
                     end;
                 {error, Reason} ->
                     % 解析请求行错误
@@ -97,7 +111,7 @@ doSend(Socket, Msg) ->
             ok;
         {error, Reason} ->
             ?LOG_INFO("reponse fail, reason:~p", [Reason]),
-            exit(Reason)
+            {error, Reason}
     end.
 
 doRecv(Socket) ->
