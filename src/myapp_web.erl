@@ -37,7 +37,7 @@ loop(ListenSocket) ->
 
 handle(Socket) ->
     % 每一个请求都会转到本函数来处理
-    case http_utils:getRequest(Socket) of
+    case http_utils:analysisRequest(Socket) of
         {ok, Method, Request} ->
             ?LOG_INFO("~nmethod:~p ~n httpObject:~p~n", [Method, Request]),
             ok;
