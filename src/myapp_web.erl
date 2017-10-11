@@ -39,8 +39,15 @@ handle(Socket) ->
     % 每一个请求都会转到本函数来处理
     case http_utils:analysisRequest(Socket) of
         {ok, Method, Request} ->
-            ?LOG_INFO("~nmethod:~p ~n httpObject:~p~n", [Method, Request]),
-            ok;
+            Method,
+            % ?LOG_INFO("~nmethod:~p ~n httpObject:~p~n", [Method, Request]),
+            LogindIn = false,
+            case request_utils:apiFilter(Request, LogindIn) of
+                ok ->
+                    ok;
+                {error, Reason} ->
+                    ?LOG_INFO("~p", [Reason])
+            end;
         {error, Reason} ->
             ?LOG_INFO("~p", [Reason])
     end,
