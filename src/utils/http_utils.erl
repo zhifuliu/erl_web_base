@@ -17,7 +17,8 @@ getRequestLine(RequestLine) ->
         3 ->
             [Method, Url, Version | _] = SplitRequestLine,
             [_, Url1 | _] = re:split(Url, "/"),
-            {ok, string:to_lower(binary_to_list(Method)), binary_to_list(Url1), binary_to_list(Version)};
+            [_, Version1 | _] = re:split(Version, "/"),
+            {ok, string:to_lower(binary_to_list(Method)), binary_to_list(Url1), binary_to_list(Version1)};
         _ ->
             {error, ?HTTP_ERROR, "请求行解析错误，不是三个数据"}
     end.
@@ -99,25 +100,23 @@ analysisRequest(Socket) ->
 
 response(Reponse) ->
     % B = iolist_to_binary(Str),
+
+    B = iolist_to_binary(Reponse#reponse.reponseData),
+    % B = unicode:characters_to_list(Reponse#reponse.reponseData),
+    % B = string:join([Reponse#reponse.reponseData], ""),
+    % Header = string:join(Reponse#reponse.reponseHeader, "\n"),
+    Header = Reponse#reponse.reponseHeader,
+    ReponseData = io_lib:fwrite("~p\n~s\n\n~s", [Reponse#reponse.reponseLine, Header, B]),
+    ?LOG_INFO("~p", [Header]),
+    ?LOG_INFO("~p", [Reponse#reponse.reponseLine]),
+    ?LOG_INFO("~p", [ReponseData]),
+    ?LOG_INFO("~p", [io_lib:fwrite("HTTP/1.0 200 Ok\nConnect-Type: text/html\nContent-length: ~p\n\n~s", [size(B), B])]),
+    iolist_to_binary(ReponseData).
     % iolist_to_binary(
     %     io_lib:fwrite(
-    %         "HTTP/1.0 200 Ok\nConnect-Type: text/html\nContent-length: ~p\n\n~s", [size(B), B]
+    %         "HTTP/1.0 404 error\nConnect-Type: text/html\nContent-length: ~p\n\n~s", [size(B), B]
     %     )
     % ).
-    B = iolist_to_binary(Reponse#reponse.reponseData),
-    % ?LOG_INFO("~p", [io_lib:fwrite("~p\n~p\n\n~s", [Reponse#reponse.reponseLine, string:join(Reponse#reponse.reponseHeader, "\n"), B])]),
-    % Result = string:join(Reponse#reponse.reponseHeader, "\n"),
-    Header = string:join(Reponse#reponse.reponseHeader, "\n"),
-    ?LOG_INFO("~w", [Header]),
-    ?LOG_INFO("~w", [Reponse#reponse.reponseLine]),
-    ?LOG_INFO("~w", [io_lib:fwrite("~p\n~p\n\n~s", [Reponse#reponse.reponseLine, Header, B])]),
-    % Result1 = string:join([Reponse#reponse.reponseLine, Result, "\n", B], "\n"),
-    % ?LOG_INFO("~p", [Result1]),
-    iolist_to_binary(
-        io_lib:fwrite(
-            "~p\n~p\n\n~s", [Reponse#reponse.reponseLine, Header, B]
-        )
-    ).
 
 doSend(Socket, Msg) ->
     case gen_tcp:send(Socket, Msg) of

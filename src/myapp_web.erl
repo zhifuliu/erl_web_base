@@ -47,8 +47,11 @@ handle(Socket) ->
                 {ok, HandleModule, HandleFunc} ->
                     erlang:apply(HandleModule, HandleFunc, [Request#request.headerParams, Request#request.requestParams]);
                 {error, ErrorCode, Reason} ->
-                    Reponse = request_utils:generateReponse(ErrorCode, "error", Request#request.httpVersion, Request#request.headerParams, "11111111"),
-                    % ?LOG_INFO("~p", [Reponse]),
+                    % ReturnData = request_utils:generateReturn(false, 0, Reason, "Data"),
+                    MapData = request_utils:generateReturn(false, 0, Reason, "Data"),
+                    ReturnData = "1111",
+                    Reponse = request_utils:generateReponse(ErrorCode, "error", Request#request.httpVersion, Request#request.headerParams, ReturnData),
+                    ?LOG_INFO("~p", [Reponse]),
                     http_utils:doSend(Socket, http_utils:response(Reponse)),
                     ?LOG_INFO("errorCode:~p ; ~p", [ErrorCode, Reason])
             end;

@@ -2,7 +2,7 @@
 
 -include("../settings.hrl").
 
--export([apiFilter/2, listAllInMap/3, generateReponse/5]).
+-export([apiFilter/2, listAllInMap/3, generateReponse/5, generateReturn/4]).
 
 % 本模块用来处理请求，比如：接口过滤器
 
@@ -55,10 +55,33 @@ apiFilter(Req, LogindIn) ->
 % 通过给定数据，构造一个 reponse 结构。只有简单的信息：Content-type、Content-length
 generateReponse(StatusCode, Msg, HttpVersion, HeaderParams, ReponseData) ->
     B = iolist_to_binary(ReponseData),
-    ReponseLine = string:join([HttpVersion, StatusCode, Msg], " "),
-    ReponseHeader = [
-        "Content-type:application/json",
-        string:join(["Content-length", erlang:size(B)], ":")
-    ],
+    % ReponseLine1 = string:join([HttpVersion, StatusCode, Msg], " "),
+    % ?LOG_INFO("~p", [ReponseLine1]),
+    % ReponseLine = io_lib:format("~w ~w ~w", [HttpVersion, StatusCode, Msg]),
+    % ?LOG_INFO("~p", [erlang:list_to_atom(ReponseLine)]),
+    % ReponseLine = string:join([HttpVersion, StatusCode, Msg], " "),
+    % ReponseLine = io_lib:fwrite("~p ~p ~p", [erlang:list_to_integer(HttpVersion), erlang:list_to_integer(StatusCode), erlang:list_to_integer(Msg)]),
+    ?LOG_INFO("~p", [tools:getVariableType(size(B))]),
+    ?LOG_INFO("~p", [tools:getVariableType(StatusCode)]),
+    ?LOG_INFO("~p", [tools:getVariableType(erlang:list_to_integer(StatusCode))]),
+    ReponseLine = io_lib:fwrite("HTTP/~w ~w ~w", [unicode:characters_to_list(HttpVersion), unicode:characters_to_list(StatusCode), unicode:characters_to_list(Msg)]),
+    % ReponseHeader = [
+    %     "Content-type: application/json",
+    %     string:join(["Content-length: ", erlang:integer_to_list(erlang:size(B))], "")
+    % ],
+    ReponseHeader = io_lib:fwrite("Content-type: application/json\nContent-length: ~p", [size(B)]),
+
+    % string:join(["Content-length: ", erlang:integer_to_list(erlang:size(B))], "")
     HeaderParams,
     #reponse{reponseLine=ReponseLine, reponseHeader=ReponseHeader, reponseData=ReponseData}.
+
+% encode(Message, _EntryPoint) ->
+%
+% encode(Term, EntryPoint) ->
+%     jsx_encoder:encode(Term, EntryPoint).
+
+% 构造返回数据
+generateReturn(Result, Code, Reason, Data) ->
+    ReturnData = #returnData{result=Result, code=Code, message=Reason, data=Data},
+    ?LOG_INFO("~p", [ReturnData]),
+    ReturnData.

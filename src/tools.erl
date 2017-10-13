@@ -30,7 +30,7 @@ getVariableType(Value) ->
         is_function(Value) ->
             function;
         is_integer(Value) ->
-            intrger;
+            integer;
         is_list(Value) ->
             list;
         is_port(Value) ->
